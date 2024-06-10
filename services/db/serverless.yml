@@ -1,0 +1,16 @@
+# Copyright 2024 enzoames. All Rights Reserved.
+
+service: rtbotdb
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  stage: ${opt:stage, 'qa'}
+
+custom:
+  membershipTableName: ${self:service}-${self:provider.stage}-membership
+
+resources:
+  Description: Resources related to the DB Service
+  Resources:
+    membershipTable: ${file(resources/dynamodb.yml):membershipTable}

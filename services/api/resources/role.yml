@@ -1,0 +1,40 @@
+# Copyright 2024 enzoames. All Rights Reserved.
+
+apiLambdaRole:
+  Type: AWS::IAM::Role
+  Properties:
+    RoleName: ${self:custom.apiLambdaRoleName}
+    AssumeRolePolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action: sts:AssumeRole
+    Policies:
+      - PolicyName: ${self:custom.baseName}-apiLambdaRolePolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:BatchGetItem
+                - dynamodb:BatchWriteItem
+                - dynamodb:ConditionCheckItem
+                - dynamodb:PutItem
+                - dynamodb:DeleteItem
+                - dynamodb:GetItem
+                - dynamodb:Query
+                - dynamodb:UpdateItem
+              Resource:
+                - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/*
+                - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/*/index/*
+            - Effect: Allow
+              Action:
+                - logs:CreateLogStream
+                - logs:CreateLogGroup
+                - logs:TagResource
+                - logs:PutLogEvents
+              Resource:
+                - arn:aws:logs:${aws:region}:${aws:accountId}:log-group:/aws/lambda/*:*:*

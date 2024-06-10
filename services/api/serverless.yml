@@ -1,0 +1,41 @@
+# Copyright 2024 enzoames. All Rights Reserved.
+
+service: rtbotapi
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  stage: ${opt:stage, 'qa'}
+  logs:
+    httpApi: true
+  iam:
+    role: apiLambdaRole
+  environment:
+    MEMBERSHIP_TABLE: ${self:custom.membershipTableName}
+
+custom:
+  baseName: ${self:service}-${self:provider.stage}
+  apiLambdaRoleName: ${self:custom.baseName}-apiLambdaRole
+  membershipTableName: rtbotdb-${self:provider.stage}-membership # name taken from resources/db
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    includeModules: false
+    packager: 'npm'
+
+functions:
+  auditLogs:
+    handler: functions/auditLogs.handler
+    role: apiLambdaRole
+    events:
+      - httpApi:
+          method: post
+          path: /rt/auditlogs
+
+resources:
+  Description: Resources related to the API Service
+  Resources:
+    apiLambdaRole: ${file(resources/role.yml):apiLambdaRole}
+
+plugins:
+  - serverless-webpack

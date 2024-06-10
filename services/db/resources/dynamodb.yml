@@ -1,0 +1,26 @@
+# Copyright 2024 enzoames. All Rights Reserved.
+
+membershipTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: ${self:custom.membershipTableName}
+    AttributeDefinitions:
+      - AttributeName: roleId
+        AttributeType: S
+      - AttributeName: userId
+        AttributeType: S
+      - AttributeName: endDate
+        AttributeType: S
+    GlobalSecondaryIndexes:
+      - IndexName: GSI1--endDate
+        KeySchema:
+          - AttributeName: endDate
+            KeyType: HASH
+        Projection:
+          ProjectionType: ALL
+    KeySchema:
+      - AttributeName: roleId
+        KeyType: HASH
+      - AttributeName: userId
+        KeyType: RANGE
+    BillingMode: PAY_PER_REQUEST
