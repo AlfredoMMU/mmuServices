@@ -20,7 +20,7 @@ exports.handler = async (event) => {
     const endDateString = endDate.toISOString().split('T')[0];
 
     const addData = {
-      TableName: process.env.MEMBERSHIP_TABLE,
+      TableName: process.env.ROLES_TABLE,
       ConditionExpression: 'attribute_not_exists(#roleId) and attribute_not_exists(#userId)',
       ExpressionAttributeNames: { '#roleId': 'roleId', '#userId': 'userId' },
       Item: {

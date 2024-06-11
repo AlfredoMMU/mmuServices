@@ -1,23 +1,24 @@
 # Copyright 2024 enzoames. All Rights Reserved.
 
-service: rtbotapi
+service: rtmanager-api
 frameworkVersion: '3'
 
 provider:
   name: aws
   runtime: nodejs20.x
+  profile: rt # from aws creds
   stage: ${opt:stage, 'qa'}
   logs:
     httpApi: true
   iam:
     role: apiLambdaRole
   environment:
-    MEMBERSHIP_TABLE: ${self:custom.membershipTableName}
+    ROLES_TABLE: ${self:custom.rolesTableName}
 
 custom:
   baseName: ${self:service}-${self:provider.stage}
   apiLambdaRoleName: ${self:custom.baseName}-apiLambdaRole
-  membershipTableName: rtbotdb-${self:provider.stage}-membership # name taken from resources/db
+  rolesTableName: rtbotdb-${self:provider.stage}-roles # name taken from resources/db
   webpack:
     webpackConfig: 'webpack.config.js'
     includeModules: false
@@ -26,11 +27,16 @@ custom:
 functions:
   auditLogs:
     handler: functions/auditLogs.handler
-    role: apiLambdaRole
     events:
       - httpApi:
           method: post
           path: /rt/auditlogs
+  roles:
+    handler: functions/roles.handler
+    events:
+      - httpApi:
+          method: get
+          path: /rt/roles/{roleId}/expired
 
 resources:
   Description: Resources related to the API Service

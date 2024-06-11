@@ -1,9 +1,9 @@
 # Copyright 2024 enzoames. All Rights Reserved.
 
-membershipTable:
+rolesTable:
   Type: AWS::DynamoDB::Table
   Properties:
-    TableName: ${self:custom.membershipTableName}
+    TableName: ${self:custom.rolesTableName}
     AttributeDefinitions:
       - AttributeName: roleId
         AttributeType: S
@@ -12,10 +12,12 @@ membershipTable:
       - AttributeName: endDate
         AttributeType: S
     GlobalSecondaryIndexes:
-      - IndexName: GSI1--endDate
+      - IndexName: GSI1--roleId-endDate
         KeySchema:
-          - AttributeName: endDate
+          - AttributeName: roleId
             KeyType: HASH
+          - AttributeName: endDate
+            KeyType: RANGE
         Projection:
           ProjectionType: ALL
     KeySchema:
