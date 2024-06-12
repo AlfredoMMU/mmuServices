@@ -9,7 +9,6 @@ exports.handler = async (event) => {
   const { pathParameters } = event;
   const roleId = pathParameters.roleId;
   const today = new Date().toISOString().split('T')[0];
-  // const today = '2025/06/15'; // test
 
   const queryParams = {
     TableName: process.env.ROLES_TABLE,
@@ -20,7 +19,6 @@ exports.handler = async (event) => {
 
   try {
     const resp = await dynamoDB.query(queryParams).promise();
-
     const items = resp.Items.map((item) => ({
       ...item,
       roleId: item.roleId.split('#')[1],

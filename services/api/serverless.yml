@@ -18,7 +18,7 @@ provider:
 custom:
   baseName: ${self:service}-${self:provider.stage}
   apiLambdaRoleName: ${self:custom.baseName}-apiLambdaRole
-  rolesTableName: rtbotdb-${self:provider.stage}-roles # name taken from resources/db
+  rolesTableName: rtmanager-db-${self:provider.stage}-roles # name taken from resources/db
   webpack:
     webpackConfig: 'webpack.config.js'
     includeModules: false

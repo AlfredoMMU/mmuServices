@@ -54,7 +54,7 @@ exports.handler = async (event) => {
 
   if (operation === REMOVE) {
     const removeData = {
-      TableName: process.env.MEMBERSHIP_TABLE,
+      TableName: process.env.ROLES_TABLE,
       ReturnValues: 'ALL_OLD',
       Key: {
         roleId: `ROLE_ID#${roleId}`,
@@ -66,7 +66,7 @@ exports.handler = async (event) => {
       const resp = await dynamoDB.delete(removeData).promise();
       if (!resp.Attributes) {
         const warnMessage = `no item found for roleId ${roleId} and userId ${userId}`;
-        console.war('[WARN]', warnMessage);
+        console.warn('[WARN]', warnMessage);
 
         return {
           statusCode: 404,
