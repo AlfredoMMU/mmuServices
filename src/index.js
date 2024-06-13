@@ -103,8 +103,7 @@ client.on(Events.ClientReady, async () => {
           await new Promise((resolve) => setTimeout(resolve, 3000));
         });
     },
-    _,
-    _,
+    ...[, ,],
     'America/New_York'
   );
 
