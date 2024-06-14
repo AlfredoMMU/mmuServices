@@ -5,6 +5,7 @@ const axios = require('axios');
 const { CronJob } = require('cron');
 const { Client, GatewayIntentBits, Events, AuditLogEvent } = require('discord.js');
 const { PromisePool } = require('@supercharge/promise-pool');
+const get = require('lodash.get');
 const log = require('./log');
 
 // creates new client
@@ -112,26 +113,31 @@ client.on(Events.ClientReady, async () => {
 
 client.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
   const { changes, targetId, action } = auditLog;
-  const currentChange = changes[0] || {};
-  const config = getConfig();
-
   const validateAction = action !== AuditLogEvent.MemberRoleUpdate;
-  const validateChange = changes.length > 1 && currentChange?.new.length > 1;
-  const validateRoleId = !config.roles.includes(currentChange?.new[0].id);
-  const isValidOperation = currentChange.key === ADD || currentChange.key === REMOVE;
 
   if (validateAction) {
     log.message('\n[LOG] event not processed', action);
     return;
   }
+
+  const currentChange = get(changes, '[0]', {});
+  const validateChange = changes.length > 1 && currentChange?.new.length > 1;
+
   if (validateChange) {
     log.message('\n[LOG] invalid change');
     return;
   }
+
+  const config = getConfig();
+  const newRoleId = get(currentChange, 'new[0].id', '');
+  const validateRoleId = !config.roles.includes(newRoleId);
+
   if (validateRoleId) {
     log.message('\n[LOG] role not processed');
     return;
   }
+
+  const isValidOperation = currentChange.key === ADD || currentChange.key === REMOVE;
 
   if (isValidOperation) {
     const data = {
