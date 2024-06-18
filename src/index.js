@@ -6,7 +6,9 @@ const { CronJob } = require('cron');
 const { Client, GatewayIntentBits, Events, AuditLogEvent } = require('discord.js');
 const { PromisePool } = require('@supercharge/promise-pool');
 const get = require('lodash.get');
-const log = require('./log');
+const log = require('./utils/log');
+const config = require('./utils/config');
+const { ADD, REMOVE } = require('./utils/constants');
 
 // creates new client
 const client = new Client({
@@ -19,34 +21,11 @@ const client = new Client({
   ],
 });
 
-const PROD = 'PROD';
-const QA = 'QA';
-const ADD = '$add';
-const REMOVE = '$remove';
-const QA_ROLE_1 = '1223331193085235280';
-const QA_ROLE_2 = '1223332060769554462';
-const MMU_MEMBER = '1077337112640229548';
-const TIMS_MEMBER = '1159520034331312329';
-const TRIAD_MEMBER = '1249396310340145272';
-const ROLES = [MMU_MEMBER, TIMS_MEMBER, TRIAD_MEMBER];
-const QA_ROLES = [QA_ROLE_1, QA_ROLE_2];
-
 const getEasterDateTime = () =>
   new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
 
-const getConfig = () => {
-  const env = process.argv[2] === '--prod' ? PROD : QA;
-  return {
-    baseUrl: process.env[`${env}_BASE_URL`],
-    botToken: process.env[`${env}_BOT_TOKEN`],
-    serverId: process.env[`${env}_SERVER_ID`],
-    roles: env == PROD ? ROLES : QA_ROLES,
-  };
-};
-
 const getExpiredRoles = async (roleId) => {
   try {
-    const config = getConfig();
     const resp = await axios({
       method: 'get',
       url: `${config.baseUrl}/rt/roles/${roleId}/expired`,
@@ -60,7 +39,6 @@ const getExpiredRoles = async (roleId) => {
 
 const postAuditLog = async (data) => {
   try {
-    const config = getConfig();
     const resp = await axios({ method: 'post', url: `${config.baseUrl}/rt/auditlogs`, data });
     log.message('[LOG] response status:', resp.status);
   } catch (e) {
@@ -80,7 +58,6 @@ client.on(Events.ClientReady, async () => {
       log.message('\n[LOG] running job: checking for expired roles');
       log.message('[LOG]', getEasterDateTime());
 
-      const config = getConfig();
       // get expired roles for each roleId
       const { results } = await PromisePool.for(config.roles)
         .withConcurrency(1)
@@ -154,4 +131,4 @@ client.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
 });
 
 // this line must be at the very end. Signs the bot in with token
-client.login(getConfig().botToken);
+client.login(config.botToken);
