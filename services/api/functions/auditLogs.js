@@ -1,4 +1,11 @@
-// Copyright 2024 enzoames. All Rights Reserved.
+/* 
+  Copyright 2024 enzoames. All Rights Reserved.
+
+  [POST] /rt/auditLogs
+
+  Endpoint creates or deletes a new a user role entry in dynamo
+  Data comes from RT-Manager bot that listens to the discord audit logs.
+*/
 
 const AWS = require('aws-sdk');
 
