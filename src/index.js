@@ -152,8 +152,8 @@ const createInvite = async (channel, role) => {
 client.on(Events.MessageCreate, async (message) => {
   try {
     if (message.content === "!twitter") {
-      const twitterChannel = await client.channels.fetch("1265414223647866910");
-      const twitterInvite = await createInvite(twitterChannel, "Twitter");
+      const twitterChannel = await client.channels.fetch(config.channels[0]);
+      const twitterInvite = await createInvite(twitterChannel, config.roles[0]);
       await message.channel.send(twitterInvite.url);
     }
   } catch (error) {
@@ -164,7 +164,7 @@ client.on(Events.MessageCreate, async (message) => {
 client.on("guildMemberAdd", async (member) => {
   try {
     const newInvites = await (
-      await client.guilds.fetch("1265413878737535079")
+      await client.guilds.fetch(config.guild)
     ).invites.fetch();
 
     const usedInvite = newInvites.find(
