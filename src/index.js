@@ -179,6 +179,7 @@ client.on("guildMemberAdd", async (member) => {
 
       if (role) {
         await member.roles.add(role);
+        await usedInvite.delete();
         delete inviteRoles[usedInvite.code];
       } 
     }
