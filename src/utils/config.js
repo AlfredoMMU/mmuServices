@@ -24,6 +24,7 @@ const getConfig = () => {
     roles: env == PROD ? ROLES : QA_ROLES,
     channels: env == PROD ? [] : QA_CHANNEL,
     guild: env == PROD ? "" : QA_GUILD,
+    port: process.env.PORT,
   };
 };
 
