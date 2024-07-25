@@ -163,8 +163,6 @@ app.post('/create-invite', async (req, res) => {
   } catch (error) {
     console.error("Failed to create invite:", error);
     res.status(500).json({ error: error.message });
-  }
-});
 
 client.on("guildMemberAdd", async (member) => {
   try {
@@ -193,7 +191,7 @@ client.on("guildMemberAdd", async (member) => {
   }
 });
 
-// this line must be at the very end. Signs the bot in with token
+
 client.login(config.botToken);
 
 app.listen(config.port, () => {console.log(`Server is running on port ${config.port}`);});
