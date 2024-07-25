@@ -130,5 +130,64 @@ client.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
   }
 });
 
+let inviteRoles = {};
+
+const createInvite = async (channel, role) => {
+  try {
+    const invite = await channel.createInvite({
+      maxAge: 0,
+      maxUses: 2,
+      unique: true,
+    });
+
+    inviteRoles[invite.code] = { role: role, uses: invite.uses };
+
+    return invite;
+  } catch (error) {
+    console.error("Failed to create invite:", error);
+    throw error;
+  }
+};
+
+client.on(Events.MessageCreate, async (message) => {
+  try {
+    if (message.content === "!twitter") {
+      const twitterChannel = await client.channels.fetch(config.channels[0]);
+      const twitterInvite = await createInvite(twitterChannel, config.roles[0]);
+      await message.channel.send(twitterInvite.url);
+    }
+  } catch (error) {
+    console.error("Error handling message create event:", error);
+  }
+});
+
+client.on("guildMemberAdd", async (member) => {
+  try {
+    const newInvites = await (
+      await client.guilds.fetch(config.guild)
+    ).invites.fetch();
+
+    const usedInvite = newInvites.find(
+      (invite) =>
+        inviteRoles[invite.code] && inviteRoles[invite.code].uses < invite.uses
+    );
+
+    if (usedInvite && inviteRoles[usedInvite.code]) {
+      const role = member.guild.roles.cache.find(
+        (role) => role.name === inviteRoles[usedInvite.code].role
+      );
+
+      if (role) {
+        await member.roles.add(role);
+        await usedInvite.delete();
+        delete inviteRoles[usedInvite.code];
+      } 
+    }
+  } catch (error) {
+    console.error("Error in guildMemberAdd event handler:", error);
+  }
+});
+
+
 // this line must be at the very end. Signs the bot in with token
 client.login(config.botToken);
