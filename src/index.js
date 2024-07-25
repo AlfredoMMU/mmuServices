@@ -166,18 +166,6 @@ app.post('/create-invite', async (req, res) => {
   }
 });
 
-client.on(Events.MessageCreate, async (message) => {
-  try {
-    if (message.content === "!twitter") {
-      const twitterChannel = await client.channels.fetch(config.channels[0]);
-      const twitterInvite = await createInvite(twitterChannel, config.roles[0]);
-      await message.channel.send(twitterInvite.url);
-    }
-  } catch (error) {
-    console.error("Error handling message create event:", error);
-  }
-});
-
 client.on("guildMemberAdd", async (member) => {
   try {
     const newInvites = await (
