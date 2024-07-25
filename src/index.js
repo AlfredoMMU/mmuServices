@@ -9,6 +9,9 @@ const get = require('lodash.get');
 const log = require('./utils/log');
 const config = require('./utils/config');
 const { ADD, REMOVE } = require('./utils/constants');
+const express = require('express');
+const app = express();
+app.use(express.json());
 
 // creates new client
 const client = new Client({
@@ -149,17 +152,17 @@ const createInvite = async (channel, role) => {
   }
 };
 
-client.on(Events.MessageCreate, async (message) => {
+app.post('/create-invite', async (req, res) => {
   try {
-    if (message.content === "!twitter") {
-      const twitterChannel = await client.channels.fetch(config.channels[0]);
-      const twitterInvite = await createInvite(twitterChannel, config.roles[0]);
-      await message.channel.send(twitterInvite.url);
-    }
+    console.log(req.body);
+    const { channelId, roleName } = req.body;
+    const channel = await client.channels.fetch(channelId);
+    const invite = await createInvite(channel, roleName);
+
+    res.status(200).json({ url: invite.url });
   } catch (error) {
-    console.error("Error handling message create event:", error);
-  }
-});
+    console.error("Failed to create invite:", error);
+    res.status(500).json({ error: error.message });
 
 client.on("guildMemberAdd", async (member) => {
   try {
@@ -189,5 +192,6 @@ client.on("guildMemberAdd", async (member) => {
 });
 
 
-// this line must be at the very end. Signs the bot in with token
 client.login(config.botToken);
+
+app.listen(config.port, () => {console.log(`Server is running on port ${config.port}`);});
