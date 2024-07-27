@@ -14,11 +14,13 @@ provider:
     role: apiLambdaRole
   environment:
     ROLES_TABLE: ${self:custom.rolesTableName}
+    TEACHABLE_TABLE: ${self:custom.teachableTableName}
 
 custom:
   baseName: ${self:service}-${self:provider.stage}
   apiLambdaRoleName: ${self:custom.baseName}-apiLambdaRole
   rolesTableName: rtmanager-db-${self:provider.stage}-roles # name taken from resources/db
+  teachableTableName: teachable-db-${self:provider.stage}-users
   webpack:
     webpackConfig: 'webpack.config.js'
     includeModules: false
@@ -37,6 +39,12 @@ functions:
       - httpApi:
           method: get
           path: /rt/roles/{roleId}/expired
+  teachableUsers:
+    handler: functions/teachableUsers.handler
+    events:
+      - httpApi:
+          method: get
+          path: /rt/teachableWebhook/users
 
 resources:
   Description: Resources related to the API Service
@@ -45,3 +53,4 @@ resources:
 
 plugins:
   - serverless-webpack
+  - serverless-dotenv-plugin
