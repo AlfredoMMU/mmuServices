@@ -71,9 +71,10 @@ async function sendEmailWithInviteLink(
           <p>Thank you for purchasing the course "${courseName}".</p>
           <p>As a valued student, you're invited to join our exclusive Discord community. Here's your personalized invite link:</p>
           <p><a href="${inviteLink}">Click here to join our Discord</a></p>
+          <p>${inviteLink}</p>
           <p>This link is unique to you and will expire in 24 hours. Don't share it with anyone else.</p>
           <p>We're excited to have you in our community!</p>
-          <p>Best regards,<br>Your Course Team</p>
+          <p>Best regards,<br>MMU Team</p>
         </body>
       </html>
     `,
@@ -91,7 +92,7 @@ This link is unique to you and will expire in 24 hours. Don't share it with anyo
 We're excited to have you in our community!
 
 Best regards,
-Your Course Team
+MMU Team
     `,
   };
 
