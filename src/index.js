@@ -108,7 +108,6 @@ client.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
     return;
   }
 
-  const config = getConfig();
   const newRoleId = get(currentChange, 'new[0].id', '');
   const validateRoleId = !config.roles.includes(newRoleId);
 
