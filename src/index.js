@@ -163,6 +163,8 @@ app.post('/create-invite', async (req, res) => {
   } catch (error) {
     console.error("Failed to create invite:", error);
     res.status(500).json({ error: error.message });
+  }
+});
 
 client.on("guildMemberAdd", async (member) => {
   try {
