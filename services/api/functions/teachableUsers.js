@@ -106,6 +106,20 @@ MMU Team
   }
 }
 
+function determineRoleFromCourse(courseFriendlyUrl) {
+  const courseRoleMap = {
+    "tim-s-trading-archives": "Tim",
+    "triad-trading-archives": "Triad",
+    "merciless-markets-silver": "Silver Member",
+    "merciless-markets-gold": "Gold Member",
+    "merciless-markets-diamond": "Diamond Member",
+  };
+
+  const defaultRole = "Twitter";
+
+  return courseRoleMap[courseFriendlyUrl] || defaultRole;
+}
+
 export const handler = async (event, context) => {
   let body;
   let statusCode = 200;
@@ -130,10 +144,12 @@ export const handler = async (event, context) => {
     }
     console.log("Extracted sale data:", JSON.stringify(saleData, null, 2));
 
+    const discordRole = determineRoleFromCourse(saleData.course.friendly_url);
+
     // Generate Discord invite link with role
     const discordInviteLink = await createDiscordInvite(
       process.env.DISCORD_CHANNEL_ID,
-      process.env.DISCORD_ROLE_NAME
+      discordRole
     );
 
     // Send email with invite link
@@ -157,6 +173,7 @@ export const handler = async (event, context) => {
       discordInviteLink: discordInviteLink,
       discordJoined: false,
       discordUserId: "",
+      discordRole: discordRole,
     };
 
     const params = {
