@@ -5,7 +5,11 @@ teachableTable:
     AttributeDefinitions:
       - AttributeName: userId
         AttributeType: S
+      - AttributeName: courseFriendlyUrl
+        AttributeType: S
     KeySchema:
       - AttributeName: userId
         KeyType: HASH
+      - AttributeName: courseFriendlyUrl
+        KeyType: RANGE
     BillingMode: PAY_PER_REQUEST

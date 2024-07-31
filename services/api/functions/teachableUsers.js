@@ -39,8 +39,14 @@ async function createDiscordInvite(channelId, roleName) {
         data += chunk;
       });
       res.on("end", () => {
-        console.log("Discord invite link:", data);
-        resolve(data);
+        try {
+          const parsedData = JSON.parse(data);
+          console.log("Discord invite link:", parsedData.url);
+          resolve(parsedData.url);
+        } catch (error) {
+          console.error("Error parsing Discord invite response:", error);
+          reject(error);
+        }
       });
     });
 
@@ -70,9 +76,9 @@ async function sendEmailWithInviteLink(
           <h1>Welcome, ${userName}!</h1>
           <p>Thank you for purchasing the course "${courseName}".</p>
           <p>As a valued student, you're invited to join our exclusive Discord community. Here's your personalized invite link:</p>
-          <p><a href="${inviteLink}">Click here to join our Discord</a></p>
+          <p>Click here to join our Discord</p>
           <p>${inviteLink}</p>
-          <p>This link is unique to you and will expire in 24 hours. Don't share it with anyone else.</p>
+          <p>This link is unique, and one time use don't share it with anyone else.</p>
           <p>We're excited to have you in our community!</p>
           <p>Best regards,<br>MMU Team</p>
         </body>
@@ -87,7 +93,7 @@ As a valued student, you're invited to join our exclusive Discord community. Her
 
 ${inviteLink}
 
-This link is unique to you and will expire in 24 hours. Don't share it with anyone else.
+This link is unique, and one time use don't share it with anyone else.
 
 We're excited to have you in our community!
 
@@ -108,14 +114,13 @@ MMU Team
 
 function determineRoleFromCourse(courseFriendlyUrl) {
   const courseRoleMap = {
-    "tim-s-trading-archives": "Tim",
-    "triad-trading-archives": "Triad",
-    "merciless-markets-silver": "Silver Member",
-    "merciless-markets-gold": "Gold Member",
-    "merciless-markets-diamond": "Diamond Member",
+    "tim-s-trading-archives": "Tim's Member",
+    "triad-trading-archives": "Triads's Member",
+    "merciless-markets-gold": "MMU Gold Member",
+    "merciless-markets-diamond": "MMU Diamond Member",
   };
 
-  const defaultRole = "Twitter";
+  const defaultRole = "User";
 
   return courseRoleMap[courseFriendlyUrl] || defaultRole;
 }
