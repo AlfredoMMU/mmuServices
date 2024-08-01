@@ -62,25 +62,32 @@ async function createDiscordInvite(channelId, roleName) {
   });
 }
 
-function determineRoleFromCourse(courseFriendlyUrl) {
+function determineRoleFromCourse(courseName) {
   const courseRoleMap = {
-    "tim-s-trading-archives": "Tim's Member",
-    "triad-trading-archives": "Triads's Member",
-    "merciless-markets-gold": "MMU Gold Member",
-    "merciless-markets-diamond": "MMU Diamond Member",
+    "Triad's Trading Archives": "Tim's Member",
+    "Tim's Trading Archives": "Triads's Member",
+    "Merciless Markets (Gold)": "MMU Gold Member",
+    "Merciless Markets (Diamond)": "MMU Diamond Member",
   };
 
   const defaultRole = "User";
 
-  return courseRoleMap[courseFriendlyUrl] || defaultRole;
+  return courseRoleMap[courseName] || defaultRole;
 }
 
 // Email Invite
-async function sendEmail(userEmail, userName, courseName, inviteLink) {
+async function sendEmail(
+  userEmail,
+  userName,
+  courseName,
+  inviteLink,
+  roleName
+) {
   const template = getCourseInviteTemplate({
     userName,
     courseName,
     inviteLink,
+    roleName,
   });
 
   const mailOptions = {
@@ -125,7 +132,7 @@ export const handler = async (event, context) => {
     }
     console.log("Extracted sale data:", JSON.stringify(saleData, null, 2));
 
-    const discordRole = determineRoleFromCourse(saleData.course.friendly_url);
+    const discordRole = determineRoleFromCourse(saleData.course.name);
 
     let discordInviteLink = "";
 
@@ -141,7 +148,8 @@ export const handler = async (event, context) => {
         saleData.user.email,
         saleData.user.name,
         saleData.course.name,
-        discordInviteLink
+        discordInviteLink,
+        discordRole
       );
     }
 
@@ -150,7 +158,7 @@ export const handler = async (event, context) => {
       userId: saleData.user.id.toString(),
       userEmail: saleData.user.email,
       userName: saleData.user.name,
-      courseFriendlyUrl: saleData.course.friendly_url,
+      courseName: saleData.course.name,
       purchaseDate: saleData.created,
       purchasePrice: saleData.final_price,
       purchaseCurrency: saleData.currency,

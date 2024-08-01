@@ -2,6 +2,7 @@ export const getCourseInviteTemplate = ({
   userName,
   courseName,
   inviteLink,
+  roleName,
 }) => ({
   subject: `Welcome to MMU - Discord Invitation`,
   html: `
@@ -51,7 +52,7 @@ export const getCourseInviteTemplate = ({
             <ol>
               <li>Click This Link: <a href="${inviteLink}">${inviteLink}</a></li>
               <li>Sign-In to Discord utilizing the same email you used to purchase the MMU Program</li>
-              <li>Join The Relentless Trading Server through the link. <span class="highlight">This link is unique and one-time use. Don't share it with anyone else.</span></li>
+              <li>Join The Relentless Trading Server through the link. <span class="highlight">This link is unique, one-time use, and will automatically grant you the ${roleName} role. Don't share it with anyone else.</span></li>
             </ol>
           </div>
           <p>We will see you in Discord to help you with the rest.</p>
@@ -74,8 +75,7 @@ export const getCourseInviteTemplate = ({
   Powered By: Discord
   
   1. Click This Link: ${inviteLink}
-  2. Sign-In to Discord utilizing the same email you used to purchase the MMU Program
-  3. Join The Relentless Trading Server through the link. This link is unique and one-time use. Don't share it with anyone else.
+  2. Join The Relentless Trading Server through the link. This link is unique, one-time use, and will automatically grant you the ${roleName} role. Don't share it with anyone else.
   
   We will see you in Discord to help you with the rest.
   

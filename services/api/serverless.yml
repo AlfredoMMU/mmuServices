@@ -43,7 +43,7 @@ functions:
     handler: functions/teachableUsers.handler
     events:
       - httpApi:
-          method: get
+          method: post
           path: /rt/teachableWebhook/users
     package:
       include:
