@@ -2,6 +2,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import nodemailer from "nodemailer";
 import https from "http";
+import { getCourseInviteTemplate } from "./templates/emailTemplates.js";
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
@@ -16,6 +17,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Discord
 async function createDiscordInvite(channelId, roleName) {
   const data = JSON.stringify({
     channelId: channelId,
@@ -60,58 +62,6 @@ async function createDiscordInvite(channelId, roleName) {
   });
 }
 
-async function sendEmailWithInviteLink(
-  userEmail,
-  userName,
-  courseName,
-  inviteLink
-) {
-  const mailOptions = {
-    from: process.env.GMAIL_USER,
-    to: userEmail,
-    subject: `Your Exclusive Discord Invite for ${courseName}`,
-    html: `
-      <html>
-        <body>
-          <h1>Welcome, ${userName}!</h1>
-          <p>Thank you for purchasing the course "${courseName}".</p>
-          <p>As a valued student, you're invited to join our exclusive Discord community. Here's your personalized invite link:</p>
-          <p>Click here to join our Discord</p>
-          <p>${inviteLink}</p>
-          <p>This link is unique, and one time use don't share it with anyone else.</p>
-          <p>We're excited to have you in our community!</p>
-          <p>Best regards,<br>MMU Team</p>
-        </body>
-      </html>
-    `,
-    text: `
-Welcome, ${userName}!
-
-Thank you for purchasing the course "${courseName}".
-
-As a valued student, you're invited to join our exclusive Discord community. Here's your personalized invite link:
-
-${inviteLink}
-
-This link is unique, and one time use don't share it with anyone else.
-
-We're excited to have you in our community!
-
-Best regards,
-MMU Team
-    `,
-  };
-
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully:", info.response);
-    return info;
-  } catch (error) {
-    console.error("Error sending email:", error);
-    throw error;
-  }
-}
-
 function determineRoleFromCourse(courseFriendlyUrl) {
   const courseRoleMap = {
     "tim-s-trading-archives": "Tim's Member",
@@ -123,6 +73,32 @@ function determineRoleFromCourse(courseFriendlyUrl) {
   const defaultRole = "User";
 
   return courseRoleMap[courseFriendlyUrl] || defaultRole;
+}
+
+// Email Invite
+async function sendEmail(userEmail, userName, courseName, inviteLink) {
+  const template = getCourseInviteTemplate({
+    userName,
+    courseName,
+    inviteLink,
+  });
+
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: userEmail,
+    subject: template.subject,
+    html: template.html,
+    text: template.text,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully:", info.response);
+    return info;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw error;
+  }
 }
 
 export const handler = async (event, context) => {
@@ -151,19 +127,23 @@ export const handler = async (event, context) => {
 
     const discordRole = determineRoleFromCourse(saleData.course.friendly_url);
 
-    // Generate Discord invite link with role
-    const discordInviteLink = await createDiscordInvite(
-      process.env.DISCORD_CHANNEL_ID,
-      discordRole
-    );
+    let discordInviteLink = "";
 
-    // Send email with invite link
-    await sendEmailWithInviteLink(
-      saleData.user.email,
-      saleData.user.name,
-      saleData.course.name,
-      discordInviteLink
-    );
+    if (discordRole != "User") {
+      // Generate Discord invite link with role
+      discordInviteLink = await createDiscordInvite(
+        process.env.DISCORD_CHANNEL_ID,
+        discordRole
+      );
+
+      // Send email with invite link
+      await sendEmail(
+        saleData.user.email,
+        saleData.user.name,
+        saleData.course.name,
+        discordInviteLink
+      );
+    }
 
     // Prepare item for DynamoDB
     const item = {
@@ -176,7 +156,6 @@ export const handler = async (event, context) => {
       purchaseCurrency: saleData.currency,
       couponCode: saleData.coupon ? saleData.coupon.code : null,
       discordInviteLink: discordInviteLink,
-      discordJoined: false,
       discordUserId: "",
       discordRole: discordRole,
     };

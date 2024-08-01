@@ -1,7 +1,7 @@
 # Copyright 2024 enzoames. All Rights Reserved.
 
 service: rtmanager-api
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 provider:
   name: aws
@@ -22,9 +22,9 @@ custom:
   rolesTableName: rtmanager-db-${self:provider.stage}-roles # name taken from resources/db
   teachableTableName: teachable-db-${self:provider.stage}-users
   webpack:
-    webpackConfig: 'webpack.config.js'
+    webpackConfig: "webpack.config.js"
     includeModules: false
-    packager: 'npm'
+    packager: "npm"
 
 functions:
   auditLogs:
@@ -45,6 +45,9 @@ functions:
       - httpApi:
           method: get
           path: /rt/teachableWebhook/users
+    package:
+      include:
+        - functions/templates/**
 
 resources:
   Description: Resources related to the API Service
