@@ -10,7 +10,7 @@ provider:
 
 custom:
   rolesTableName: ${self:service}-${self:provider.stage}-roles
-  teachableTableName: teachable-db-${self:provider.stage}-users
+  teachableTableName: teachable-ddb-${self:provider.stage}-users
 
 resources:
   Description: Resources related to the DB Service

@@ -20,7 +20,7 @@ custom:
   baseName: ${self:service}-${self:provider.stage}
   apiLambdaRoleName: ${self:custom.baseName}-apiLambdaRole
   rolesTableName: rtmanager-db-${self:provider.stage}-roles # name taken from resources/db
-  teachableTableName: teachable-db-${self:provider.stage}-users
+  teachableTableName: teachable-ddb-${self:provider.stage}-users
   webpack:
     webpackConfig: "webpack.config.js"
     includeModules: false
