@@ -132,7 +132,7 @@ export const handler = async (event, context) => {
     }
     console.log("Extracted sale data:", JSON.stringify(saleData, null, 2));
 
-    const discordRole = determineRoleFromCourse(saleData.course.name);
+    const discordRole = determineRoleFromCourse(saleData.course ? saleData.course.name : "Course");
 
     let discordInviteLink = "";
 
@@ -158,7 +158,7 @@ export const handler = async (event, context) => {
       userId: saleData.user.id.toString(),
       userEmail: saleData.user.email,
       userName: saleData.user.name,
-      courseName: saleData.course.name,
+      courseName: saleData.course ? saleData.course.name : "Course",
       purchaseDate: saleData.created,
       purchasePrice: saleData.final_price,
       purchaseCurrency: saleData.currency,
