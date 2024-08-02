@@ -181,7 +181,7 @@ export const handler = async (event, context) => {
     };
   } catch (err) {
     console.error("Error:", err);
-    statusCode = 500;
+    statusCode = 200; // Prevent Teachable webhook from retrying
     body = { error: err.message };
   }
 
