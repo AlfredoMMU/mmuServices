@@ -132,7 +132,9 @@ export const handler = async (event, context) => {
     }
     console.log("Extracted sale data:", JSON.stringify(saleData, null, 2));
 
-    const discordRole = determineRoleFromCourse(saleData.course ? saleData.course.name : "Course");
+    const discordRole = determineRoleFromCourse(
+      saleData.course ? saleData.course.name : "Course"
+    );
 
     let discordInviteLink = "";
 
@@ -155,17 +157,31 @@ export const handler = async (event, context) => {
 
     // Prepare item for DynamoDB
     const item = {
-      userId: saleData.user.id.toString(),
-      userEmail: saleData.user.email,
-      userName: saleData.user.name,
-      courseName: saleData.course ? saleData.course.name : "Course",
-      purchaseDate: saleData.created,
-      purchasePrice: saleData.final_price,
-      purchaseCurrency: saleData.currency,
-      couponCode: saleData.coupon ? saleData.coupon.code : null,
-      discordInviteLink: discordInviteLink,
+      userId:
+        saleData.user && saleData.user.id
+          ? saleData.user.id.toString()
+          : "User ID",
+      userEmail:
+        saleData.user && saleData.user.email
+          ? saleData.user.email
+          : "user@email.com",
+      userName:
+        saleData.user && saleData.user.name ? saleData.user.name : "User Name",
+      courseName:
+        saleData.course && saleData.course.name
+          ? saleData.course.name
+          : "Course Name",
+      purchaseDate: saleData.created || new Date().toISOString(),
+      purchasePrice:
+        saleData.final_price !== undefined ? saleData.final_price : 0,
+      purchaseCurrency: saleData.currency || "USD",
+      couponCode:
+        saleData.coupon && saleData.coupon.code
+          ? saleData.coupon.code
+          : "No Coupon",
+      discordInviteLink: discordInviteLink || "No Invite Link",
       discordUserId: "",
-      discordRole: discordRole,
+      discordRole: discordRole || "No Role",
     };
 
     const params = {
