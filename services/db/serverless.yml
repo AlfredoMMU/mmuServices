@@ -10,10 +10,8 @@ provider:
 
 custom:
   rolesTableName: ${self:service}-${self:provider.stage}-roles
-  teachableTableName: teachable-ddb-${self:provider.stage}-users
 
 resources:
   Description: Resources related to the DB Service
   Resources:
     rolesTable: ${file(resources/dynamodb.yml):rolesTable}
-    teachableTable: ${file(resources/teachableDynamodbTable.yml):teachableTable}
