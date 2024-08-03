@@ -1,0 +1,15 @@
+teachableTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: ${self:custom.teachableTableName}
+    AttributeDefinitions:
+      - AttributeName: userId
+        AttributeType: S
+      - AttributeName: courseName
+        AttributeType: S
+    KeySchema:
+      - AttributeName: userId
+        KeyType: HASH
+      - AttributeName: courseName
+        KeyType: RANGE
+    BillingMode: PAY_PER_REQUEST

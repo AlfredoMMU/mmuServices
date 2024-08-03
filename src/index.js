@@ -9,6 +9,9 @@ const get = require('lodash.get');
 const log = require('./utils/log');
 const config = require('./utils/config');
 const { ADD, REMOVE } = require('./utils/constants');
+const express = require('express');
+const app = express();
+app.use(express.json());
 
 // creates new client
 const client = new Client({
@@ -105,7 +108,6 @@ client.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
     return;
   }
 
-  const config = getConfig();
   const newRoleId = get(currentChange, 'new[0].id', '');
   const validateRoleId = !config.roles.includes(newRoleId);
 
@@ -130,5 +132,67 @@ client.on(Events.GuildAuditLogEntryCreate, async (auditLog) => {
   }
 });
 
-// this line must be at the very end. Signs the bot in with token
+let inviteRoles = {};
+
+const createInvite = async (channel, role) => {
+  try {
+    const invite = await channel.createInvite({
+      maxAge: 0,
+      maxUses: 2,
+      unique: true,
+    });
+
+    inviteRoles[invite.code] = { role: role, uses: invite.uses };
+
+    return invite;
+  } catch (error) {
+    console.error("Failed to create invite:", error);
+    throw error;
+  }
+};
+
+app.post('/create-invite', async (req, res) => {
+  try {
+    console.log(req.body);
+    const { channelId, roleName } = req.body;
+    const channel = await client.channels.fetch(channelId);
+    const invite = await createInvite(channel, roleName);
+
+    res.status(200).json({ url: invite.url });
+  } catch (error) {
+    console.error("Failed to create invite:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+client.on("guildMemberAdd", async (member) => {
+  try {
+    const newInvites = await (
+      await client.guilds.fetch(config.guild)
+    ).invites.fetch();
+
+    const usedInvite = newInvites.find(
+      (invite) =>
+        inviteRoles[invite.code] && inviteRoles[invite.code].uses < invite.uses
+    );
+
+    if (usedInvite && inviteRoles[usedInvite.code]) {
+      const role = member.guild.roles.cache.find(
+        (role) => role.name === inviteRoles[usedInvite.code].role
+      );
+
+      if (role) {
+        await member.roles.add(role);
+        await usedInvite.delete();
+        delete inviteRoles[usedInvite.code];
+      } 
+    }
+  } catch (error) {
+    console.error("Error in guildMemberAdd event handler:", error);
+  }
+});
+
+
 client.login(config.botToken);
+
+app.listen(config.port, () => {console.log(`Server is running on port ${config.port}`);});

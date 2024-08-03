@@ -26,6 +26,7 @@
     "cron": "^3.1.7",
     "discord.js": "^14.15.2",
     "dotenv": "^16.4.5",
+    "express": "^4.19.2",
     "lodash.get": "^4.4.2"
   },
   "devDependencies": {
