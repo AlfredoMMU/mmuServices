@@ -12,10 +12,6 @@
     "serverless-webpack": "^5.14.0"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.620.0",
-    "@aws-sdk/lib-dynamodb": "^3.620.0",
-    "aws-sdk": "^2.1637.0",
-    "nodemailer": "^6.9.14",
-    "serverless-dotenv-plugin": "^6.0.0"
+    "aws-sdk": "^2.1637.0"
   }
 }
