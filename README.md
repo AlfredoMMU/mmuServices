@@ -18,8 +18,14 @@ The Discord bot integrated with AWS services to manage user sign-ups for a Teach
 2. Deploy AWS Lambda functions to Production
 
    ```bash
+   # Navigate to API directory
    cd services/api
+
+   # Deploy entire stack
    serverless deploy --stage prod
+
+   # Deploy single function (faster updates)
+   serverless deploy function --function teachableUsers --stage prod --aws-profile default
    ```
 
 3. Deploy DynamoDB tables to Production
