@@ -68,6 +68,7 @@ function determineRoleFromCourse(courseName) {
     "Tim's Trading Archives": "Triads's Member",
     "Merciless Markets (Gold)": "MMU Gold Member",
     "Merciless Markets (Diamond)": "MMU Diamond Member",
+    "Accelerated Micro-Scalping (Full) Program": "MMU Diamond Member",
   };
 
   const defaultRole = "User";
